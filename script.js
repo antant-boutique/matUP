@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 //const analytics = getAnalytics(app);
 console.log(app)
 
-var ui = new firebaseui.auth.AuthUI(firebase.auth());
+var ui = new firebaseui.auth.AuthUI(app.auth());
 
 ui.start('#firebaseui-auth-container', {
   signInOptions: [
