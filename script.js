@@ -25,7 +25,7 @@ var ui = new firebaseui.auth.AuthUI(app.auth());
 
 ui.start('#firebaseui-auth-container', {
   signInOptions: [
-    firebase.auth.EmailAuthProvider.PROVIDER_ID
+    app.auth.EmailAuthProvider.PROVIDER_ID
   ],
   // Other config options...
 });
