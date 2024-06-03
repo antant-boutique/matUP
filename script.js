@@ -21,6 +21,15 @@ const app = initializeApp(firebaseConfig);
 //const analytics = getAnalytics(app);
 console.log(app)
 
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+ui.start('#firebaseui-auth-container', {
+  signInOptions: [
+    firebase.auth.EmailAuthProvider.PROVIDER_ID
+  ],
+  // Other config options...
+});
+
 // Global variables
 var currentPage = 0;					// current Page number
 var form = document.getElementById('materialForm');	// material form
