@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Material Form</title>
+	<!-- CSS script for styling -->
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<h2>Material Form</h2>
+	<form id="materialForm">
+		<!-- Image input placeholder and preview -->
+		<div class="image-input-container">
+			<label for="picture">Picture of the material</label>
+			<div class="image-input">
+				<input type="file" id="picture" name="picture" accept="image/*;capture=camera" required>
+				<img id="preview" class="image-preview">
+			</div>
+		</div>
+
+		<!-- Text and number entries in the form -->
+		<label for="source">Source</label>
+                <input type="text" id="source" name="source" required>
+
+		<label for="material">Material Name</label>
+		<input type="text" id="material" name="material" required>
+
+		<label for="color">Color/Print</label>
+		<input type="text" id="color" name="color" required>
+
+		<label for="size">Size</label>
+		<input type="number" id="quantity" name="quantity" required>
+
+		<label for="price">Price</label>
+		<input type="number" id="price" name="price" required>
+
+		<!-- Buttons for Next and Back -->
+		<div class="button-container">
+			<button type="button" id="backButton" style="display: none;">&lt;</button>
+			<button type="button" id="nextButton">&gt;</button>
+		</div>
+	</form>
+	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+	<script type="module" src="script.js"></script>
+</body>
+</html>
+
+
+
