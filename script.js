@@ -1,3 +1,7 @@
+var firebase = require('firebase');
+var firebaseui = require('firebaseui');
+
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 //import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
@@ -21,11 +25,11 @@ const app = initializeApp(firebaseConfig);
 //const analytics = getAnalytics(app);
 console.log(app)
 
-var ui = new firebaseui.auth.AuthUI(app.auth());
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
 
 ui.start('#firebaseui-auth-container', {
   signInOptions: [
-    app.auth.EmailAuthProvider.PROVIDER_ID
+    firebase.auth.EmailAuthProvider.PROVIDER_ID
   ],
   // Other config options...
 });
