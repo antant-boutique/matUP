@@ -4,6 +4,7 @@ var firebaseui = require('firebaseui');
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 //import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -25,14 +26,19 @@ const app = initializeApp(firebaseConfig);
 //const analytics = getAnalytics(app);
 console.log(app)
 
-var ui = new firebaseui.auth.AuthUI(firebase.auth());
-
-ui.start('#firebaseui-auth-container', {
-  signInOptions: [
-    firebase.auth.EmailAuthProvider.PROVIDER_ID
-  ],
-  // Other config options...
+const auth = getAuth();
+signInWithEmailAndPassword(auth, email, password)
+.then((userCredential) => {
+	// Signed in
+	const user = userCredential.user;
+	console.log(user.uid)
+	// ...
+})
+.catch((error) => {
+	const errorCode = error.code;
+	const errorMessage = error.message;
 });
+
 
 // Global variables
 var currentPage = 0;					// current Page number
