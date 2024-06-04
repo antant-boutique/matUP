@@ -21,23 +21,6 @@ label, input, select {
     	margin-top: 20px;
 }
 
-#finishButton {
-	display: flex;
-	width: auto;
-	height: 40px;
-	font-size: 20px;
-        font-weight: bold;
-	background-color: green;
-        color: white;
-        border: 2px solid black;
-        padding: 10px 10px;
-        border-radius: 50%;
-        cursor: pointer;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
-}
-
 #backButton, #nextButton {
 	display: flex;
 	width: 40px;
