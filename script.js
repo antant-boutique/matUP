@@ -25,8 +25,6 @@ function populateFormFields() {
 		var values = urlParams[key];
 		if (values && values.length > 0) {
 			inputField.value = values[0];
-		} else if (key == 'prepic') {
-			inputField.value = '#';
 		} else {
   			inputField.value = '';
 		}
@@ -41,9 +39,12 @@ function checkIfEmpty() {
 	inputFields.forEach(function (inputField) {
 		let name = inputField.name;
                 let value = inputField.value;
-		if (value == '' && name != 'picture') {
+		console.log(name);
+		console.log(value);
+		if (value == '' && (name != "picture" && name != "prepic")) {
 			formIsEmpty = true;
 		}
+		console.log(formIsEmpty);
 	});
 	return formIsEmpty;
 }
@@ -67,11 +68,12 @@ function moveToPreviousSet() {
 	var inputFields = document.querySelectorAll('input[data-values]');
 	var inputImage = document.getElementById('preview');
 	var formIsEmpty = checkIfEmpty();
+	console.log(inputFields);
 	//currentPage = currentPage - 1;
 	inputFields.forEach(function (inputField) {
 		var key = inputField.name;
 		if (key == 'picture') {
-                        var value = inputImage.src;
+                        var value = inputImage.src.toLowerCase().startsWith("http") ? '#' : inputImage.src;
                 } else {
                         var value = inputField.value;
                 }
@@ -129,7 +131,8 @@ function moveToNextSet() {
 	inputFields.forEach(function (inputField) {
 		var key = inputField.name;
 		if (key == 'picture') {
-			var value = inputImage.src;
+			var value = inputImage.src.toLowerCase().startsWith("http") ? '#' : inputImage.src;
+			console.log(value);
 		} else {
 			var value = inputField.value;
 		}
@@ -188,67 +191,56 @@ function moveToNextSet() {
 // Image input handling
 const pictureInput = document.getElementById('picture');
 const previewImage = document.getElementById('preview');
+const prepic = document.getElementById('prepic');
 var pic_inputField = document.querySelectorAll('input[name="picture"][data-values]');
 var touchStarted = false;
 
 pictureInput.addEventListener('change', function() {
 	const file = this.files[0];
+	console.log(file);
 	if (file) {
 		readImage(file)
     		.then((dataURL) => {
-		//const reader = new FileReader();
-		//reader.addEventListener('load', function() {
-		//	previewImage.src = reader.result;
+			console.log(dataURL);
 			previewImage.src = dataURL;
 			previewImage.style.display = 'block';
-			pictureInput.src = file;
-			//pictureInput.src = reader.result;
-                        //pictureInput.style.display = 'block';
-		});
+			const filePath = pictureInput.value;
+			const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+			prepic.value = fileName;
+		})
+		.catch((error) => {
+                        previewImage.src = '#';
+			previewImage.style.display = 'none';
+			pictureInput.src = '#';
+			pictureInput.value = '';
+			const filePath = pictureInput.value;
+			const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+			prepic.value = fileName;
+                });
 
-		//reader.readAsDataURL(file);
 	} else {
+		console.log('else triggered!')
 		previewImage.src = '#';
 		previewImage.style.display = 'none';
-		pictureInput.src = '';
-                //pictureInput.style.display = 'none';
+		pictureInput.src = '#';
+		pictureInput.value = '';
+		const filePath = pictureInput.value;
+                const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+		prepic.value = fileName;
 	}
+
 });
 
 
-/*// Touch event listeners for mobile devices
-pictureInput.addEventListener('touchstart', function(event) {
-	touchStarted = true;
-	event.stopPropagation();
-});
-
-pictureInput.addEventListener('touchend', function(event) {
-	if (touchStarted) {
-		event.preventDefault();
-		touchStarted = false;
-		const clickEvent = new MouseEvent('click');
-        	pictureInput.dispatchEvent(clickEvent);
-      	}
-});
-
-
-// Toggle the clicked class on image input click
-const imageInput = document.querySelector('.image-input');
-imageInput.addEventListener('click', function(event) {
-	const target = event.target;
-	if (target.tagName === 'DIV' || target.tagName === 'INPUT') {
-		pictureInput.click();
-	}
-});*/
 
 document.getElementById('backButton').addEventListener('click', function () {
 	moveToPreviousSet();
-	console.log(formData.price.length);
+	console.log(formData);
 });
 
 document.getElementById('nextButton').addEventListener('click', function () {
         moveToNextSet();
-	console.log(formData.price.length);
+	console.log(formData);
 });
 
 window.onload = populateFormFields;
