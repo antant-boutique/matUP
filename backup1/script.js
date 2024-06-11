@@ -2,45 +2,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getStorage, ref, uploadString, getDownloadURL, updateMetadata } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-//import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-	apiKey: "AIzaSyDcHo4rDarasQ6vpTjtVYT0xu8T43AI4B8",
-	authDomain: "test1-1e3d0.firebaseapp.com",
-	projectId: "test1-1e3d0",
-	storageBucket: "test1-1e3d0.appspot.com",
-	messagingSenderId: "31521875447",
-	appId: "1:31521875447:web:866af9b76ad347441ffaf2",
-	measurementId: "G-C2WHYVRCSD"
+        apiKey: "AIzaSyDcHo4rDarasQ6vpTjtVYT0xu8T43AI4B8",
+        authDomain: "test1-1e3d0.firebaseapp.com",
+        projectId: "test1-1e3d0",
+        storageBucket: "test1-1e3d0.appspot.com",
+        messagingSenderId: "31521875447",
+        appId: "1:31521875447:web:866af9b76ad347441ffaf2",
+        measurementId: "G-C2WHYVRCSD"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-//const analytics = getAnalytics(app);
-console.log(app)
-
-/*const auth = getAuth();
-signInWithEmailAndPassword(auth, 'antant.boutique@gmail.com', 'G9q!6aB@r1S*7t2L')
-.then((userCredential) => {
-	// Signed in
-	const user = userCredential.user;
-	console.log(user.uid);
-	// ...
-})
-.catch((error) => {
-	const errorCode = error.code;
-	const errorMessage = error.message;
-	console.log(errorMessage);
-});
-
-const storage = getStorage();
-const storageRef = ref(storage, 'UtCuILrOuIRKuxAXVa32pVIhqRC2/');
-console.log(storageRef)*/
-
 
 // Global variables
 var currentPage = 0;					// current Page number
@@ -83,23 +58,41 @@ function checkIfEmpty() {
 	inputFields.forEach(function (inputField) {
 		let name = inputField.name;
                 let value = inputField.value;
-		if (value == '' && name != 'picture') {
+		console.log(name);
+		console.log(value);
+		if (value == '' && (name != "picture" && name != "prepic")) {
 			formIsEmpty = true;
 		}
+		console.log(formIsEmpty);
 	});
 	return formIsEmpty;
 }
+
+function readImage(file) {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = function(event) {
+			resolve(event.target.result);
+    		};
+    		reader.onerror = function(error) {
+      			reject(error);
+    		};
+    		reader.readAsDataURL(file);
+  	});
+}
+
 
 // A function to move to Previous set of inputs when the back button is pressed
 function moveToPreviousSet() {
 	var inputFields = document.querySelectorAll('input[data-values]');
 	var inputImage = document.getElementById('preview');
 	var formIsEmpty = checkIfEmpty();
+	console.log(inputFields);
 	//currentPage = currentPage - 1;
 	inputFields.forEach(function (inputField) {
 		var key = inputField.name;
 		if (key == 'picture') {
-                        var value = inputImage.src;
+                        var value = inputImage.src.toLowerCase().startsWith("http") ? '#' : inputImage.src;
                 } else {
                         var value = inputField.value;
                 }
@@ -152,11 +145,13 @@ function moveToNextSet() {
 	if (!formIsEmpty) {
 	var inputFields = document.querySelectorAll('input[data-values]');
 	var inputImage = document.getElementById('preview');
+	console.log(inputFields)
 	//currentPage = currentPage + 1;
 	inputFields.forEach(function (inputField) {
 		var key = inputField.name;
 		if (key == 'picture') {
-			var value = inputImage.src;
+			var value = inputImage.src.toLowerCase().startsWith("http") ? '#' : inputImage.src;
+			console.log(value);
 		} else {
 			var value = inputField.value;
 		}
@@ -215,122 +210,70 @@ function moveToNextSet() {
 // Image input handling
 const pictureInput = document.getElementById('picture');
 const previewImage = document.getElementById('preview');
+const prepic = document.getElementById('prepic');
 var pic_inputField = document.querySelectorAll('input[name="picture"][data-values]');
 var touchStarted = false;
 
 pictureInput.addEventListener('change', function() {
 	const file = this.files[0];
+	console.log(file);
 	if (file) {
-		console.log(file)
-		const reader = new FileReader();
-		reader.addEventListener('load', function() {
-			previewImage.src = reader.result;
+		readImage(file)
+    		.then((dataURL) => {
+			console.log(dataURL);
+			previewImage.src = dataURL;
 			previewImage.style.display = 'block';
-			//pictureInput.src = reader.result;
-                        //pictureInput.style.display = 'block';
-		});
+			const filePath = pictureInput.value;
+			const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+			prepic.value = fileName;
+		})
+		.catch((error) => {
+                        previewImage.src = '#';
+			previewImage.style.display = 'none';
+			pictureInput.src = '#';
+			pictureInput.value = '';
+			const filePath = pictureInput.value;
+			const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+			prepic.value = fileName;
+                });
 
-		reader.readAsDataURL(file);
 	} else {
+		console.log('else triggered!')
 		previewImage.src = '#';
 		previewImage.style.display = 'none';
-		pictureInput.src = '';
-                //pictureInput.style.display = 'none';
+		pictureInput.src = '#';
+		pictureInput.value = '';
+		const filePath = pictureInput.value;
+                const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+		prepic.value = fileName;
 	}
+
 });
 
 
-// Touch event listeners for mobile devices
-pictureInput.addEventListener('touchstart', function(event) {
-	touchStarted = true;
-	event.stopPropagation();
-});
-
-pictureInput.addEventListener('touchend', function(event) {
-	if (touchStarted) {
-		event.preventDefault();
-		touchStarted = false;
-		const clickEvent = new MouseEvent('click');
-        	pictureInput.dispatchEvent(clickEvent);
-      	}
-});
-
-
-// Toggle the clicked class on image input click
-const imageInput = document.querySelector('.image-input');
-imageInput.addEventListener('click', function(event) {
-	const target = event.target;
-	if (target.tagName === 'DIV' || target.tagName === 'INPUT') {
-		pictureInput.click();
-	}
-});
 
 document.getElementById('backButton').addEventListener('click', function () {
 	moveToPreviousSet();
-	console.log(formData.price.length);
+	console.log(formData);
 });
 
 document.getElementById('nextButton').addEventListener('click', function () {
         moveToNextSet();
-	const auth = getAuth();
-	signInWithEmailAndPassword(auth, 'antant.boutique@gmail.com', 'G9q!6aB@r1S*7t2L')
-	.then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-	const storage = getStorage();
-	console.log(storage)
-	//const message4 = formData.picture[0];
-	const message4 = JSON.stringify(formData);
-	const storageRef = ref(storage,'user/'+user.uid+'/profile.json');
-	uploadString(storageRef, message4).then((snapshot) => {
-		
-    	// Observe state change events such as progress, pause, and resume
-    	// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-	console.log(snapshot.bytesTransferred);
-	console.log(snapshot.totalBytes);
-	
-    	const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    	console.log('Upload is ' + progress + '% done');
-    	switch (snapshot.state) {
-      	case 'paused':
-        	console.log('Upload is paused');
-        	break;
-      	case 'running':
-        	console.log('Upload is running');
-        	break;
-    	}
-  	},
-  	(error) => {
-    	// Handle unsuccessful uploads
-  	},
-  	() => {
-    	// Handle successful uploads on complete
-    	// For instance, get the download URL: https://firebasestorage.googleapis.com/...
-    	getDownloadURL(snapshot.ref).then((downloadURL) => {
-      	console.log('File available at', downloadURL);
-    	});
-
-	});
-	updateMetadata(storageRef, formData)
-  	.then((metadata) => {
-    	// Updated metadata for 'images/forest.jpg' is returned in the Promise
-  	}).catch((error) => {
-    	// Uh-oh, an error occurred!
-  	});
-        console.log(user.uid);
-        // ...
-	})
-	.catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage);
-	});
+	console.log(formData);
 });
 
 window.onload = populateFormFields;
 
+const finishButton = document.getElementById("finishButton");
+finishButton.addEventListener('click', function() {
+	moveToNextSet();
+        formData['formname'] = 'Material Entry';
+        var jsonString = JSON.stringify(formData);
+	console.log(jsonString)
+	alert('Button was clicked!!');
+});
 
-Telegram.WebApp.ready();
+/*Telegram.WebApp.ready();
 Telegram.WebApp.MainButton.setText('Finish').show().onClick(function () {
 	moveToNextSet();
 	const entryLength = formData.price.length;
@@ -346,4 +289,4 @@ Telegram.WebApp.MainButton.setText('Finish').show().onClick(function () {
         Telegram.WebApp.sendData(jsonString);
         Telegram.WebApp.close();
 });
-Telegram.WebApp.expand();
+Telegram.WebApp.expand();*/
